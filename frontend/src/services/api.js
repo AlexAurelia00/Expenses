@@ -7,8 +7,15 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-supabase
 // Initialize Supabase Client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// HTTP API Base URL (routed through proxy in dev). For production set VITE_API_BASE to your backend URL (e.g. https://api.example.com/api)
-const API_BASE = import.meta.env.VITE_API_BASE || '/api';
+// HTTP API Base URL (routed through proxy in dev).
+// For production set `VITE_API_BASE` to your backend URL (e.g. https://api.example.com/api)
+// If it's missing or left as the default '/api' in a static build, fall back to the known backend host.
+const rawApiBase = import.meta.env.VITE_API_BASE || '/api';
+const FALLBACK_BACKEND = 'https://expenses-pj86.onrender.com/api';
+const API_BASE = (rawApiBase === '/api' || !rawApiBase) ? FALLBACK_BACKEND : rawApiBase;
+
+// Log the resolved API base to help troubleshoot live deployments
+console.info('Resolved API_BASE =', API_BASE);
 
 // Helper to get authorization headers
 const getHeaders = async () => {

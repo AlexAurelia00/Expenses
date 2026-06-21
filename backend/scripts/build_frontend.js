@@ -1,9 +1,13 @@
 import { exec } from 'child_process';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const frontendDir = path.resolve(process.cwd(), '..', 'frontend');
-const outDir = path.resolve(process.cwd(), 'public');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const repoRoot = path.resolve(__dirname, '..', '..');
+const frontendDir = path.join(repoRoot, 'frontend');
+const outDir = path.join(__dirname, '..', 'public');
 
 function run(cmd, cwd) {
   return new Promise((resolve, reject) => {
@@ -44,7 +48,7 @@ async function main() {
     // install dependencies (quiet)
     await run('npm ci --silent --no-audit --no-fund', frontendDir);
   } catch (e) {
-    console.warn('npm ci failed or already installed, continuing');
+    console.warn('npm ci failed or already installed, continuing', e);
   }
 
   await run('npm run build', frontendDir);

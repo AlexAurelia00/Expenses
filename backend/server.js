@@ -21,6 +21,10 @@ import * as notificationController from './controllers/notificationController.js
 dotenv.config();
 
 const app = express();
+
+// When running behind a proxy (Render, Heroku, etc.), enable trust proxy
+// so express-rate-limit can correctly identify client IPs via X-Forwarded-For.
+app.set('trust proxy', true);
 const PORT = process.env.PORT || 5000;
 
 // Security Middlewares

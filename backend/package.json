@@ -6,7 +6,6 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "prestart": "npm run build-frontend",
     "dev": "nodemon server.js",
     "build-frontend": "node ./scripts/build_frontend.js"
   },

@@ -3,6 +3,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 
 // Import Middleware
 import { requireAuth } from './middleware/authMiddleware.js';
@@ -77,9 +80,28 @@ app.get('/api/reports/export/:format', requireAuth, reportController.exportRepor
 app.get('/api/notifications', requireAuth, notificationController.getNotifications);
 app.patch('/api/notifications/:id/read', requireAuth, notificationController.markAsRead);
 
-// 404 Route handler
+// Serve frontend static files if present (bundled into backend/public)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const publicDir = path.join(__dirname, 'public');
+
+if (fs.existsSync(publicDir)) {
+  app.use(express.static(publicDir));
+
+  // Serve index.html for client-side routes, but let /api routes fall through to API handlers
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(publicDir, 'index.html'));
+  });
+}
+
+// 404 Route handler (if no frontend served or route not found)
 app.use((req, res, next) => {
-  res.status(404).json({ error: 'Route not found' });
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ error: 'Route not found' });
+  }
+  // For non-API routes, fall back to a simple message when frontend not bundled
+  res.status(404).send('Not Found');
 });
 
 // Error handling middleware

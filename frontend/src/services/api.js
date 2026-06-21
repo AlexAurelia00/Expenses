@@ -7,8 +7,8 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-supabase
 // Initialize Supabase Client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// HTTP API Base URL (routed through proxy in dev, or relative in prod)
-const API_BASE = '/api';
+// HTTP API Base URL (routed through proxy in dev). For production set VITE_API_BASE to your backend URL (e.g. https://api.example.com/api)
+const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 // Helper to get authorization headers
 const getHeaders = async () => {

@@ -1,0 +1,26 @@
+# Sample Render manifest to deploy frontend (static site) and backend (web service).
+# Edit names, plan, and repo settings as needed before applying in Render.
+
+services:
+  - type: web
+    name: splitwise-backend
+    env: node
+    plan: free
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    env:
+      - key: SUPABASE_URL
+      - key: SUPABASE_ANON_KEY
+      - key: SUPABASE_SERVICE_ROLE_KEY
+      - key: NODE_ENV
+
+static_sites:
+  - name: splitwise-frontend
+    repo: .
+    branch: main
+    buildCommand: cd frontend && npm install && npm run build
+    publishPath: frontend/dist
+    env:
+      - key: VITE_SUPABASE_URL
+      - key: VITE_SUPABASE_ANON_KEY
+      - key: VITE_API_BASE

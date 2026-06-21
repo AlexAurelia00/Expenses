@@ -34,7 +34,21 @@ const request = async (endpoint, options = {}) => {
   };
 
   const response = await fetch(url, config);
-  const data = await response.json();
+
+  // If the response is JSON parse it, otherwise return the raw text for better error visibility
+  const contentType = response.headers.get('content-type') || '';
+  let data;
+  if (contentType.includes('application/json')) {
+    data = await response.json();
+  } else {
+    const text = await response.text();
+    // Throw a descriptive error so the caller sees HTML error pages when the API endpoint is wrong
+    if (!response.ok) {
+      throw new Error(`Non-JSON response (${response.status}): ${text.substring(0, 500)}`);
+    }
+    // If response.ok but non-JSON, return the raw text
+    return text;
+  }
 
   if (!response.ok) {
     throw new Error(data.error || 'Something went wrong with the request.');
